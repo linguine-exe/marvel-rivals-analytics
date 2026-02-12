@@ -185,3 +185,29 @@ Outputs are written to `data/processed/`:
 - `data/processed/maps.csv` (normalized table)
 - `data/processed/maps_summary.csv` (counts and simple metrics)
 
+
+
+## Milestone 3: Reporting (maps visual report)
+
+Generate a polished maps report from processed CSVs:
+
+```bash
+python -m marvel_rivals_analytics report maps
+```
+
+Optional directories:
+
+```bash
+python -m marvel_rivals_analytics report maps --processed-dir data/processed --reports-dir reports
+```
+
+Outputs are written to `reports/`:
+
+- `reports/maps_report_<timestamp>.md`
+- `reports/maps_by_mode_<timestamp>.png`
+
+If `data/processed/maps.csv` or `data/processed/maps_summary.csv` is missing, run:
+
+```bash
+python -m marvel_rivals_analytics analyze maps
+```
