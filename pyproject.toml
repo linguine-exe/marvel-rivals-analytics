@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "marvel-rivals-analytics"
+version = "0.1.0"
+description = "CLI and data pipeline scaffolding for Marvel Rivals analytics"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{ name = "Marvel Rivals Analytics Contributors" }]
+dependencies = []
+
+[project.scripts]
+marvel-rivals-analytics = "marvel_rivals_analytics.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
