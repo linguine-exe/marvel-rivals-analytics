@@ -28,6 +28,7 @@ jobs:
           python -m marvel_rivals_analytics ping
 
       - name: Real API fetch test
+        if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
         env:
           MR_API_BASE_URL: ${{ secrets.MR_API_BASE_URL }}
           MR_API_KEY: ${{ secrets.MR_API_KEY }}
