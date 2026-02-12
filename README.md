@@ -123,3 +123,32 @@ export MR_API_BASE_URL="https://api.example.com"
 export MR_API_KEY="your-api-key"
 python -m marvel_rivals_analytics ping
 ```
+
+## Milestone 1: Data fetching
+
+Set API environment variables:
+
+```bash
+export MR_API_BASE_URL="https://marvelrivalsapi.com/api/v1"
+export MR_API_KEY="your-real-api-key"
+```
+
+Dry run for `/maps` (prints URL and whether `x-api-key` is set, without calling the API):
+
+```bash
+python -m marvel_rivals_analytics fetch /maps --dry-run
+```
+
+Real fetch for `/maps`:
+
+```bash
+python -m marvel_rivals_analytics fetch /maps
+```
+
+Fetch with params:
+
+```bash
+python -m marvel_rivals_analytics fetch /maps --params region=global lang=en
+```
+
+Raw payloads and metadata sidecars are written to `data/raw/` by default.
