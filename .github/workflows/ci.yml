@@ -7,6 +7,9 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      MR_API_BASE_URL: ${{ secrets.MR_API_BASE_URL }}
+      MR_API_KEY: ${{ secrets.MR_API_KEY }}
 
     steps:
       - name: Checkout repository
@@ -27,11 +30,12 @@ jobs:
           python -m marvel_rivals_analytics --help
           python -m marvel_rivals_analytics ping
 
+      - name: Live API test skipped notice
+        if: env.MR_API_BASE_URL == '' || env.MR_API_KEY == ''
+        run: echo "Live API test skipped because MR_API_BASE_URL or MR_API_KEY is not set."
+
       - name: Real API fetch test
-        if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
-        env:
-          MR_API_BASE_URL: ${{ secrets.MR_API_BASE_URL }}
-          MR_API_KEY: ${{ secrets.MR_API_KEY }}
+        if: (github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository) && env.MR_API_BASE_URL != '' && env.MR_API_KEY != ''
         run: |
           python -m marvel_rivals_analytics fetch /maps
           python -m marvel_rivals_analytics analyze maps
