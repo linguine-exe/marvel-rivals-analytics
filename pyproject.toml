@@ -9,7 +9,7 @@ description = "CLI and data pipeline scaffolding for Marvel Rivals analytics"
 readme = "README.md"
 requires-python = ">=3.10"
 authors = [{ name = "Marvel Rivals Analytics Contributors" }]
-dependencies = ["requests>=2.31", "pandas>=2.0"]
+dependencies = ["requests>=2.31", "pandas>=2.0", "matplotlib>=3.8"]
 
 [project.scripts]
 marvel-rivals-analytics = "marvel_rivals_analytics.cli:main"

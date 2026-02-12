@@ -7,6 +7,7 @@ from pathlib import Path
 
 from .analytics.maps import MapsDataError, analyze_maps_to_csv
 from .api_client import ApiClient, ApiClientError
+from .reports.maps_report import MapsReportError, generate_maps_report
 from .raw_saver import save_raw_json, save_request_metadata
 from .utils.config import get_settings
 from .utils.files import FileDiscoveryError, find_latest_raw_file
@@ -80,6 +81,24 @@ def build_parser() -> argparse.ArgumentParser:
         help="Directory for processed outputs (default: data/processed)",
     )
     analyze_maps_parser.set_defaults(func=cmd_analyze_maps)
+
+    report_parser = subparsers.add_parser("report", help="Generate reports from processed data")
+    report_subparsers = report_parser.add_subparsers(dest="report_target")
+
+    report_maps_parser = report_subparsers.add_parser("maps", help="Generate markdown + chart report for maps")
+    report_maps_parser.add_argument(
+        "--processed-dir",
+        type=Path,
+        default=Path("data/processed"),
+        help="Directory containing processed maps.csv files (default: data/processed)",
+    )
+    report_maps_parser.add_argument(
+        "--reports-dir",
+        type=Path,
+        default=Path("reports"),
+        help="Directory for report outputs (default: reports)",
+    )
+    report_maps_parser.set_defaults(func=cmd_report_maps)
 
     return parser
 
@@ -176,6 +195,20 @@ def cmd_analyze_maps(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_report_maps(args: argparse.Namespace) -> int:
+    """Handle the `report maps` command."""
+    artifacts = generate_maps_report(
+        processed_dir=args.processed_dir,
+        reports_dir=args.reports_dir,
+    )
+
+    print(f"total_maps={artifacts.total_maps}")
+    print(f"grouped_by={artifacts.dimension_name}")
+    print(f"saved_chart={artifacts.chart_path}")
+    print(f"saved_report={artifacts.markdown_path}")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     """CLI entrypoint."""
     parser = build_parser()
@@ -186,7 +219,7 @@ def main(argv: list[str] | None = None) -> int:
     try:
         if hasattr(args, "func"):
             return args.func(args)
-    except (ValueError, ApiClientError, FileDiscoveryError, MapsDataError) as exc:
+    except (ValueError, ApiClientError, FileDiscoveryError, MapsDataError, MapsReportError) as exc:
         parser.error(str(exc))
 
     parser.print_help()
