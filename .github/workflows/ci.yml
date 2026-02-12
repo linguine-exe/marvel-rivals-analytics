@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install package
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .
+
+      - name: CLI smoke tests
+        run: |
+          python -m marvel_rivals_analytics --help
+          python -m marvel_rivals_analytics ping
+
+      - name: Real API fetch test
+        env:
+          MR_API_BASE_URL: ${{ secrets.MR_API_BASE_URL }}
+          MR_API_KEY: ${{ secrets.MR_API_KEY }}
+        run: |
+          python -m marvel_rivals_analytics fetch /maps
+          python -m marvel_rivals_analytics analyze maps
+          python -m marvel_rivals_analytics report maps
+          find data/raw -maxdepth 2 -type f | sort
+          find reports -maxdepth 2 -type f | sort
