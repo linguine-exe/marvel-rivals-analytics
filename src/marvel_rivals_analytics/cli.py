@@ -5,9 +5,11 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
+from .analytics.maps import MapsDataError, analyze_maps_to_csv
 from .api_client import ApiClient, ApiClientError
 from .raw_saver import save_raw_json, save_request_metadata
 from .utils.config import get_settings
+from .utils.files import FileDiscoveryError, find_latest_raw_file
 from .utils.logging import setup_logging
 
 
@@ -48,6 +50,36 @@ def build_parser() -> argparse.ArgumentParser:
         help="Print request details without making an API call",
     )
     fetch_parser.set_defaults(func=cmd_fetch)
+
+    analyze_parser = subparsers.add_parser("analyze", help="Analyze saved raw JSON files")
+    analyze_subparsers = analyze_parser.add_subparsers(dest="analyze_target")
+
+    analyze_maps_parser = analyze_subparsers.add_parser(
+        "maps", help="Transform saved /maps payloads into CSV tables"
+    )
+    analyze_maps_parser.add_argument(
+        "--latest",
+        action="store_true",
+        help="Use latest maps_*.json from data/raw (default behavior)",
+    )
+    analyze_maps_parser.add_argument(
+        "--infile",
+        type=Path,
+        help="Path to a specific raw maps JSON file",
+    )
+    analyze_maps_parser.add_argument(
+        "--raw-dir",
+        type=Path,
+        default=Path("data/raw"),
+        help="Directory containing raw files (default: data/raw)",
+    )
+    analyze_maps_parser.add_argument(
+        "--outdir",
+        type=Path,
+        default=Path("data/processed"),
+        help="Directory for processed outputs (default: data/processed)",
+    )
+    analyze_maps_parser.set_defaults(func=cmd_analyze_maps)
 
     return parser
 
@@ -129,6 +161,21 @@ def cmd_fetch(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_analyze_maps(args: argparse.Namespace) -> int:
+    """Handle the `analyze maps` command."""
+    infile = args.infile
+    if infile is None or args.latest:
+        infile = find_latest_raw_file(endpoint_slug="maps", raw_dir=args.raw_dir)
+
+    maps_csv, summary_csv, row_count = analyze_maps_to_csv(infile=infile, processed_dir=args.outdir)
+
+    print(f"input_file={infile}")
+    print(f"maps_rows={row_count}")
+    print(f"saved_table={maps_csv}")
+    print(f"saved_summary={summary_csv}")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     """CLI entrypoint."""
     parser = build_parser()
@@ -139,7 +186,7 @@ def main(argv: list[str] | None = None) -> int:
     try:
         if hasattr(args, "func"):
             return args.func(args)
-    except (ValueError, ApiClientError) as exc:
+    except (ValueError, ApiClientError, FileDiscoveryError, MapsDataError) as exc:
         parser.error(str(exc))
 
     parser.print_help()
