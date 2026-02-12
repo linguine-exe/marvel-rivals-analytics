@@ -152,3 +152,36 @@ python -m marvel_rivals_analytics fetch /maps --params region=global lang=en
 ```
 
 Raw payloads and metadata sidecars are written to `data/raw/` by default.
+
+
+## Milestone 2: Analytics (maps to CSV)
+
+Fetch `/maps` raw JSON first:
+
+```bash
+python -m marvel_rivals_analytics fetch /maps
+```
+
+Analyze the latest saved maps payload (default behavior):
+
+```bash
+python -m marvel_rivals_analytics analyze maps
+```
+
+Analyze a specific raw input file:
+
+```bash
+python -m marvel_rivals_analytics analyze maps --infile data/raw/maps_YYYY-mm-ddTHH-MM-SSZ.json
+```
+
+You can also force latest-file selection explicitly:
+
+```bash
+python -m marvel_rivals_analytics analyze maps --latest
+```
+
+Outputs are written to `data/processed/`:
+
+- `data/processed/maps.csv` (normalized table)
+- `data/processed/maps_summary.csv` (counts and simple metrics)
+
