@@ -96,3 +96,30 @@ This project demonstrates the ability to:
 - Design dashboards similar to those used by game studios
 
 This repository serves as a portfolio-ready example of applied game analytics.
+
+---
+
+## Milestone 0: Project wiring (current)
+
+### Setup
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -e .
+```
+
+### CLI sanity checks
+
+```bash
+python -m marvel_rivals_analytics --help
+python -m marvel_rivals_analytics ping
+```
+
+### Optional environment variables
+
+```bash
+export MR_API_BASE_URL="https://api.example.com"
+export MR_API_KEY="your-api-key"
+python -m marvel_rivals_analytics ping
+```
